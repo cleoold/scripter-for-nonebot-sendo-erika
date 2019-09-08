@@ -57,7 +57,7 @@
         wait 5
         speak "hello world"
 
-    [00:00:01]hello world
+    [00:00:05]hello world
     ```
 
 *   __`setv var_name = some_value`__
