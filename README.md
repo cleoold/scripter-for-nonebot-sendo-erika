@@ -212,4 +212,4 @@ That's almost it! 这就是本插件的大多数功能了。以后就可以延�
 #### features coming in their way
 
 ### License
-[GNU GENERAL PUBLIC LICENSE](https://www.gnu.org/licenses/gpl-3.0.en.html)
+MIT
