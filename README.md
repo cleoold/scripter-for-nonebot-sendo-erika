@@ -1,5 +1,5 @@
 ## scripter for [sendo erika](https://github.com/cleoold/sendo-erika) on [NoneBot](https://github.com/richardchien/nonebot)
-![Python](https://img.shields.io/badge/python-3.6%2B-blue.svg)
+![Python](https://img.shields.io/badge/python-3.7%2B-blue.svg)
 <hr />
 
 某天突发奇想，然后就写出了这个插件的雏形。这个插件可以在聊天窗口控制 Nonebot 群聊机器人来发送消息。目前还仅支持延时发送。您可以通过本文档快速学习它的用法（这个插件相当于一个远程 `eval`）：

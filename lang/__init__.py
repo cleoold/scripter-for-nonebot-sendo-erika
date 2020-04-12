@@ -31,7 +31,7 @@ async def run_script(session: CommandSession):
     if time() - lastCall <= COOLDOWN:
         await session.send(f'技能冷却中…… ({COOLDOWN}s)')
         return
-    log.logger.debug(f'user {session.ctx["user_id"]} is trying to run a script')
+    log.logger.debug(f'user {session.event["user_id"]} is trying to run a script')
     code: str = session.get('code')
     async with async_timeout.timeout(300):
         try:
@@ -54,9 +54,7 @@ async def _(session: CommandSession):
 @on_command('启动脚本到群', aliases=('scriptto', 'scriptto:'), permission=SUPERUSER)
 async def run_script_A(session: CommandSession):
     bot = get_bot()
-    param = session.get('param')
-    paramSplit = param.split('\n', 1)
-    groupId, code = paramSplit[0], paramSplit[1]
+    groupId, code = session.get('group'), session.get('code')
     await session.send('脚本开始执行.')
     await runScriptLangAdmin(code, bot, session, groupId)
     await session.send('脚本执行完毕.')
@@ -65,8 +63,10 @@ async def run_script_A(session: CommandSession):
 @run_script_A.args_parser
 async def arg_parser_x(session: CommandSession):
     argStripped = session.current_arg.strip()
-    if argStripped:
-        session.state['param'] = argStripped
+    paramSplit = argStripped.split('\n', 1)
+    if len(paramSplit) == 2:
+        session.state['group'] = paramSplit[0]
+        session.state['code'] = paramSplit[1]
     else:
         await session.send('用法：scriptto [群号] [这里空行] [code]')
         session.finish()
