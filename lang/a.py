@@ -74,6 +74,12 @@ def variableNameValid(name):
     return (name not in RESERVED_KWS) and ('"' not in name) and ("'" not in name)
 
 
+class RepeatedClause:
+    def __init__(self, block, range_or_cnt):
+        self.block = block
+        self.count = len(range_or_cnt) if isinstance(range_or_cnt, range) else range_or_cnt
+
+
 class EvalGrammar:
     
     def __init__(self, string, externalFunctions={
@@ -341,9 +347,7 @@ class EvalGrammar:
                 loopContent.push(current)
         except IndexError:
             raise EOFError(f'Unexpected end of sequence.')
-        for _ in range(shouldBeStartVal, shouldBeEndVal, shouldBeStepLength):
-            for j in range(len(loopContent.items)-1, -1, -1):
-                self._keywords.push(loopContent.items[j])
+        self._keywords.push(RepeatedClause(loopContent, range(shouldBeStartVal, shouldBeEndVal, shouldBeStepLength)))
 
 
     def _handlesRemove(self):
@@ -400,10 +404,15 @@ class EvalGrammar:
         )
 
 
+    def _handlesRepeatedClause(self, clause):
+        self._keywords.push(RepeatedClause(clause.block, clause.count - 1))
+        for tk in reversed(clause.block.items):
+            self._keywords.push(tk)
+
     def _scan(self):
         'scans for operations from above to bottom.'
         while not self._keywords.is_empty():
-            token: str = self._keywords.pop()
+            token = self._keywords.pop()
             if token in SEPS:
                 continue
             elif token == 'setv':
@@ -416,11 +425,14 @@ class EvalGrammar:
                 self._handlesSpeak()
             elif token == 'wait':
                 self._handlesWait()
+            elif isinstance(token, RepeatedClause):
+                if token.count > 0:
+                    self._handlesRepeatedClause(token)
             # consider this, at default, a defined variable (todo)
             else:
                 raise SyntaxError(f'Unexpected token {token}.')
             self._exec_so_far()
-    
+
 
     def _exec_so_far(self):
         'runs the first event in the event queue.'
